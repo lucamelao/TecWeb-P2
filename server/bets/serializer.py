@@ -17,7 +17,7 @@ class RoundSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Round
-        fields = ['number', 'fixtures']
+        fields = ['number', 'fixtures', 'round_score']
 
 class BetSerializer(serializers.ModelSerializer):
     rounds = RoundSerializer(many=True)
@@ -25,3 +25,11 @@ class BetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bet
         fields = ['user','rounds']
+
+
+class RoundSecondSerializer(serializers.ModelSerializer):
+    fixtures = FixtureSerializer(many=True)
+
+    class Meta:
+        model = Round
+        fields = ['number','round_score', 'bet', 'fixtures',]

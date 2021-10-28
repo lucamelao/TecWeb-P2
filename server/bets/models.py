@@ -2,6 +2,7 @@ from django.db import models
 
 class Bet(models.Model):
     user = models.CharField(max_length=100)
+    total_score = models.IntegerField()
 
     def __str__(self):
         return '%d' % (self.user)
@@ -9,6 +10,7 @@ class Bet(models.Model):
 class Round(models.Model):
     number = models.CharField(max_length=2)
     bet = models.ForeignKey(Bet, on_delete=models.CASCADE, related_name='rounds')
+    round_score = models.IntegerField()
 
     def __str__(self):
         return '%d' % (self.number)
@@ -16,6 +18,7 @@ class Round(models.Model):
 class Fixture(models.Model):
     home_team = models.CharField(max_length=100)
     away_team = models.CharField(max_length=100)
+    slug = models.CharField()
     round = models.ForeignKey(Round, on_delete=models.CASCADE, related_name='fixtures')
 
     def __str__(self):

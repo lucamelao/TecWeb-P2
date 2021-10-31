@@ -1,11 +1,12 @@
 from .models import Bet, Round, Score, Fixture
-from .serializer import BetSerializer, RoundSerializer, RoundSecondSerializer
+from .serializer import BetSerializer, RoundSerializer, FixtureSerializer, ScoreSerializer
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from rest_framework import status
 import json
 from django.core.exceptions import ObjectDoesNotExist
 from django.shortcuts import get_object_or_404
+from .api_futebol import get_results
 
 @api_view(["GET"])
 def get_bets(request):
@@ -42,12 +43,63 @@ def post_bet(request):
 
     for i in fixtures:
 
-        fixture = Fixture(home_team = i["home"], away_team = i["away"] , round=new_round)
+        fixture = Fixture(home_team = i["home"], away_team = i["away"] , round=new_round, fixture_score=0, slug=i["slug"])
         fixture.save()
         score = Score(home_score = i["score"]["home"], away_score = i["score"]["away"], fixture=fixture)
         score.save()
        
 
     return JsonResponse({'status': "ok"}, safe=False, status=status.HTTP_200_OK)
-        
+
+def calculate_round_scores():
+    all_rounds = Round.objects.all()
+    all_fixtures = Fixture.objects.all()
+    for i in all_rounds:
+        round = Round.objects.filter(id=i.id)
+        round_score = 0
+        for j in all_fixtures:
+            if j.round == i:
+                round_score += j.fixture_score
+        round.update(round_score = round_score)
+
+def calculate_bet_scores():
+    all_rounds = Round.objects.all()
+    all_bets = Bet.objects.all()
+    for i in all_bets:
+        bet = Bet.objects.filter(id=i.id)
+        for j in all_rounds:
+            total_score = 0
+            if j.bet == i:
+                total_score += j.round_score
+        bet.update(total_score = total_score)
+
+
+
+
+@api_view(["GET"])
+def calculate_scores(request, round_number):
+    partidas = get_results(round_number)
+    scores = Score.objects.filter(fixture__round__number = round_number)
+    for i in scores:
+        print(i.fixture.fixture_score)
+        fix = Fixture.objects.filter(id=i.fixture.id)
+        for j in partidas:
+            if i.fixture.slug == j["slug"]:
+                if i.home_score == j["placar_mandante"] and i.away_score == j["placar_visitante"]:
+                    fix.update(fixture_score = 5)
+                elif i.home_score > i.away_score and j["placar_mandante"] > j["placar_visitante"]:
+                    fix.update(fixture_score = 3)
+                elif i.home_score < i.away_score and j["placar_mandante"] < j["placar_visitante"]:
+                    fix.update(fixture_score = 3)
+                elif i.home_score == i.away_score and j["placar_mandante"] == j["placar_visitante"]:
+                    fix.update(fixture_score = 3)
+                else:
+                    fix.update(fixture_score = 0)
+                
+
+    calculate_round_scores()
+    calculate_bet_scores()
+    bets = Bet.objects.all()
+    serializer = BetSerializer(bets, many=True)
+    return JsonResponse({'all': serializer.data}, safe=False, status=status.HTTP_200_OK)
 

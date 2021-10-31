@@ -1,23 +1,22 @@
 from rest_framework import serializers
 from .models import Bet, Round, Fixture, Score
 
-class ScoreSerializer(serializers.ModelSerializer):
+class RoundSerializer(serializers.ModelSerializer):
+    fixtures = FixtureSerializer(many=True)
     class Meta:
-        model = Score
-        fields = ['home_score', 'away_score']
+        model = Round
+        fields = ['number', 'fixtures', 'round_score']
 
 class FixtureSerializer(serializers.ModelSerializer):
     score = ScoreSerializer(many=False)
     class Meta:
         model = Fixture
-        fields = ['home_team', 'away_team', 'score', 'slug', 'fixture_score']
+        fields = ['home_team', 'away_team', 'score', 'slug']
 
-class RoundSerializer(serializers.ModelSerializer):
-    fixtures = FixtureSerializer(many=True)
-
+class ScoreSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Round
-        fields = ['number', 'fixtures', 'round_score']
+        model = Score
+        fields = ['home_score', 'away_score']
 
 class BetSerializer(serializers.ModelSerializer):
     rounds = RoundSerializer(many=True) 

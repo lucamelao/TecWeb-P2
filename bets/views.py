@@ -10,7 +10,7 @@ from .api_futebol import get_results
 
 @api_view(["GET"])
 def get_bets(request):
-    bets = Bet.objects.all()
+    bets = Bet.objects.all().order_by('-total_score')
     serializer = BetSerializer(bets, many=True)
     return JsonResponse({'bets': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
@@ -68,8 +68,8 @@ def calculate_bet_scores():
     all_bets = Bet.objects.all()
     for i in all_bets:
         bet = Bet.objects.filter(id=i.id)
+        total_score = 0
         for j in all_rounds:
-            total_score = 0
             if j.bet == i:
                 total_score += j.round_score
         bet.update(total_score = total_score)

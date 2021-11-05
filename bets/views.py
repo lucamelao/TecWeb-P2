@@ -35,7 +35,8 @@ def post_bet(request):
         bet = Bet(user = payload["user"], total_score = 0)
         bet.save()
     else:
-        bet = user_bet[0]
+        # bet = user_bet[0]
+        return JsonResponse({'status': "user has already made a bet"}, safe=False, status=status.HTTP_401_UNAUTHORIZED)
 
     fixtures = payload["fixtures"]
     new_round = Round(number =  payload["round"], bet=bet, round_score=0)
@@ -81,7 +82,6 @@ def calculate_scores(request, round_number):
     partidas = get_results(round_number)
     scores = Score.objects.filter(fixture__round__number = round_number)
     for i in scores:
-        print(i.fixture.fixture_score)
         fix = Fixture.objects.filter(id=i.fixture.id)
         for j in partidas:
             if i.fixture.slug == j["slug"]:

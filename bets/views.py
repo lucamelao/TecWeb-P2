@@ -1,11 +1,10 @@
 from .models import Bet, Round, Score, Fixture
-from .serializer import BetSerializer, RoundSerializer, FixtureSerializer, ScoreSerializer
+from .serializer import BetSerializer, RoundSerializer, FixtureSerializer, ScoreSerializer, BetSerializer2
 from rest_framework.decorators import api_view
 from django.http import JsonResponse
 from rest_framework import status
 import json
 from django.core.exceptions import ObjectDoesNotExist
-from django.shortcuts import get_object_or_404
 from .api_futebol import get_results
 
 @api_view(["GET"])
@@ -15,16 +14,16 @@ def get_bets(request):
     return JsonResponse({'bets': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-def get_user_bet(request, bet_id):
-    user_bet = Bet.objects.get_object_or_404(id = bet_id)
-    serializer = BetSerializer(user_bet, many=True)
+def get_total_scores(request):
+    bets = Bet.objects.all().order_by('-total_score')
+    serializer = BetSerializer2(bets, many=True)
     return JsonResponse({'bets': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 @api_view(["GET"])
-def get_round(request, round_number):
-    round = Round.objects.filter(number = round_number)
-    serializer = RoundSecondSerializer(round, many=True)
-    return JsonResponse({'round': serializer.data}, safe=False, status=status.HTTP_200_OK)
+def get_user_bet(request, bet_id):
+    user_bet = Bet.objects.get(id = bet_id)
+    serializer = BetSerializer(user_bet)
+    return JsonResponse({'bet': serializer.data}, safe=False, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 def post_bet(request):

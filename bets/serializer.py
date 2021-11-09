@@ -25,3 +25,8 @@ class BetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Bet
         fields = ['user','rounds', 'total_score']
+
+class BetSerializer2(serializers.ModelSerializer):
+    class Meta:
+        model = Bet
+        fields = ['user', 'total_score', 'id']

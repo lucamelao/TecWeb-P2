@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-#5%1^q-aghaa!it7jz7prdw5uy=&*82$&r=6707^00bf%v4u^^
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['quiet-crag-78188.herokuapp.com', 'localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['api-big-bet.herokuapp.com', 'localhost', '127.0.0.1']
 
 # Application definition
 

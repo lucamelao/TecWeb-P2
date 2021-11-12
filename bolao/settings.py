@@ -86,7 +86,7 @@ WSGI_APPLICATION = 'bolao.wsgi.application'
 
 DATABASES = {
     'default': dj_database_url.config(
-        default='postgresql://localhost/<NAME>?user=<USER>&password=<PASSWORD>',
+        default='postgresql://localhost/bolao?user=bolaouser&password=bolaopassword',
         conn_max_age=600,
         ssl_require=not DEBUG
     )
